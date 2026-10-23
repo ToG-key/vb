@@ -1,0 +1,30 @@
+name: Run View Booster Worker
+
+on:
+  schedule:
+    # Tự động chạy lại 6 tiếng 1 lần (0h, 6h, 12h, 18h UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Cho phép bạn bấm chạy thủ công bằng tay
+
+jobs:
+  run-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360 # Tự động hủy sau 6 tiếng để nhường lượt chạy mới
+    
+    steps:
+      - name: Lấy code từ repo
+        uses: actions/checkout@v4
+        
+      - name: Cài đặt Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          
+      - name: Cài đặt thư viện
+        run: pip install -r requirements.txt
+        
+      - name: Chạy Worker
+        env:
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+        run: python worker.py
