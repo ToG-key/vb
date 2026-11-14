@@ -87,7 +87,6 @@ def process_all_files(action, password, script_name):
     current_dir = os.getcwd()
     files = [f for f in os.listdir(current_dir) if os.path.isfile(os.path.join(current_dir, f))]
     
-    # Lọc danh sách file hợp lệ để đếm tổng số (n)
     if action == "1":
         valid_files = [f for f in files if f != script_name and not f.endswith(".enc")]
     elif action == "2":
@@ -100,7 +99,6 @@ def process_all_files(action, password, script_name):
     count_error = 0
 
     for index, filename in enumerate(valid_files, start=1):
-        # Chỉ in tiến trình n/n (dùng \r để ghi đè lên dòng cũ, tạo cảm giác mượt mà)
         print(f"\r{index}/{total}", end="", flush=True)
         
         file_path = os.path.join(current_dir, filename)
@@ -113,7 +111,6 @@ def process_all_files(action, password, script_name):
         except Exception:
             count_error += 1
 
-    # Xuống dòng sau khi chạy xong
     if total > 0:
         print() 
 
@@ -126,39 +123,31 @@ def main():
     password = sys.argv[3]
     script_name = os.path.basename(sys.argv[0])
     
+    # CHẠY MÃ HÓA / GIẢI MÃ
     if target.lower() == "all":
         process_all_files(action, password, script_name)
-        
-        if action == "1":
-            try:
-                script_path = os.path.abspath(sys.argv[0])
-                if os.path.exists(script_path):
-                    os.remove(script_path)
-            except:
-                pass
-                
     else:
         if not os.path.exists(target):
             sys.exit(1)
         try:
+            print("1/1", end="", flush=True)
             if action == "1":
-                print("1/1", end="", flush=True)
                 encrypt_file(target, password)
-                print()
-                
-                try:
-                    script_path = os.path.abspath(sys.argv[0])
-                    if os.path.exists(script_path):
-                        os.remove(script_path)
-                except:
-                    pass
-                    
             elif action == "2":
-                print("1/1", end="", flush=True)
                 decrypt_file(target, password)
-                print()
+            print()
         except Exception:
             sys.exit(1)
+
+    # =====================================================
+    # XÓA FILE SCRIPT SAU KHI HOÀN TẤT (Áp dụng cho cả 1 và 2)
+    # =====================================================
+    try:
+        script_path = os.path.abspath(sys.argv[0])
+        if os.path.exists(script_path):
+            os.remove(script_path)
+    except:
+        pass
 
 if __name__ == "__main__":
     main()
